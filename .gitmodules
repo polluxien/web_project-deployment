@@ -1,0 +1,6 @@
+[submodule "Trinkprotokolle_Web_Backend"]
+	path = Trinkprotokolle_Web_Backend
+	url = https://github.com/polluxien/WEB_Backend_Trinkprotokolle
+[submodule "Trinkprotokolle_Web_Frontend"]
+	path = Trinkprotokolle_Web_Frontend
+	url = https://github.com/polluxien/WEB_Frontend_Trinkprotokolle
