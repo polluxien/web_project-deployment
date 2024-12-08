@@ -14,39 +14,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Setup
+      # Checkout code
       - name: Check out code
         uses: actions/checkout@v3
 
-      - name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
-
+      # Install Docker Compose
       - name: Install Docker Compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      # Build Docker images
       - name: Build Docker images
         run: |
           docker-compose -f docker-compose.yml build
 
-      # Install frontend dependencies and run tests
+      # Run Frontend tests
       - name: Run Frontend Tests
         run: |
-          docker-compose -f docker-compose.yml run frontend npm ci  # Install dependencies
-          docker-compose -f docker-compose.yml run frontend npx playwright install  # Install Playwright browsers
-          docker-compose -f docker-compose.yml run frontend npm test  # Run Playwright tests
+          docker-compose -f docker-compose.yml run frontend npm ci
+          docker-compose -f docker-compose.yml run frontend npx playwright install
+          docker-compose -f docker-compose.yml run frontend npm test
 
-      # Run Backend Tests
+      # Run Backend tests
       - name: Run Backend Tests
         run: |
-          docker-compose -f docker-compose.yml run backend npm ci  # Install backend dependencies
-          docker-compose -f docker-compose.yml run backend npm test  # Run backend tests
+          docker-compose -f docker-compose.yml run backend npm ci
+          docker-compose -f docker-compose.yml run backend npm test
 
   deploy:
     name: Deploy to Production
@@ -57,6 +51,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
+      # Deploy with Docker Compose
       - name: Deploy with Docker Compose
         run: |
           docker-compose -f docker-compose.yml up -d
