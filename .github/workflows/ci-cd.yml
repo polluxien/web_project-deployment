@@ -4,41 +4,49 @@ on:
   push:
     branches:
       - master
-  pull_request:
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-test:
     name: Build & Test
+    timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:
-
-    # setup:
-
+      # Setup
       - name: Check out code
         uses: actions/checkout@v3
 
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
-        
+
       - name: Install Docker Compose
         run: |
-         sudo apt-get update
-         sudo apt-get install -y docker-compose
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
       - name: Build Docker images
         run: |
           docker-compose -f docker-compose.yml build
 
-      # testing:
-
+      # Install frontend dependencies and run tests
       - name: Run Frontend Tests
         run: |
-          docker-compose -f docker-compose.yml run frontend npm test
+          docker-compose -f docker-compose.yml run frontend npm ci  # Install dependencies
+          docker-compose -f docker-compose.yml run frontend npx playwright install  # Install Playwright browsers
+          docker-compose -f docker-compose.yml run frontend npm test  # Run Playwright tests
 
+      # Run Backend Tests
       - name: Run Backend Tests
         run: |
-          docker-compose -f docker-compose.yml run backend npm test
+          docker-compose -f docker-compose.yml run backend npm ci  # Install backend dependencies
+          docker-compose -f docker-compose.yml run backend npm test  # Run backend tests
 
   deploy:
     name: Deploy to Production
@@ -49,7 +57,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      # 2. Deploy Docker Compose
       - name: Deploy with Docker Compose
         run: |
           docker-compose -f docker-compose.yml up -d
