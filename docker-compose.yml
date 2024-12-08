@@ -16,6 +16,7 @@ services:
   frontend:
     build:
       context: WEB_Frontend_Trinkprotokolle
+       dockerfile: Dockerfile 
     container_name: frontend
     ports:
       - "3000:80"
