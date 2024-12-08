@@ -23,17 +23,17 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker-compose -f deployment/docker-compose.yml build
+          docker-compose -f docker-compose.yml build
 
       # testing:
 
       - name: Run Frontend Tests
         run: |
-          docker-compose -f deployment/docker-compose.yml run frontend npm test
+          docker-compose -f docker-compose.yml run frontend npm test
 
       - name: Run Backend Tests
         run: |
-          docker-compose -f deployment/docker-compose.yml run backend npm test
+          docker-compose -f docker-compose.yml run backend npm test
 
   deploy:
     name: Deploy to Production
@@ -47,4 +47,4 @@ jobs:
       # 2. Deploy Docker Compose
       - name: Deploy with Docker Compose
         run: |
-          docker-compose -f deployment/docker-compose.yml up -d
+          docker-compose -f docker-compose.yml up -d
