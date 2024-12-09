@@ -33,10 +33,15 @@ jobs:
         run: |
           docker-compose -f docker-compose.yml build
 
+      # Starte Docker Container
+      - name: Start Docker containers
+        run: |
+          docker-compose -f docker-compose.yml up -d
+
       # Test Frontend und Backend connection
       - name: Test Frontend and Backend Connectivity
         run: |
-          sleep 10
+          sleep 2
           curl -I http://frontend:3000
           curl -I http://backend:3001
 
