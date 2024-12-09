@@ -4,7 +4,7 @@ export class AdminPage {
   constructor(private page: Page) {}
 
   async navigateToLoginPage() {
-    await this.page.goto(process.env.BASE_URL || "http://localhost:3000");
+    await this.page.goto(process.env.FRONTEND_URL || "http://localhost:3000");
     await this.page.getByTestId("login-button").click();
   }
 
@@ -25,7 +25,7 @@ export class AdminPage {
 
   async isOnAdminPage() {
     return (
-      this.page.url() === process.env.BASE_URL + "/admin" ||
+      this.page.url() === process.env.FRONTEND_URL + "/admin" ||
       "http://localhost:3000/admin"
     );
   }
