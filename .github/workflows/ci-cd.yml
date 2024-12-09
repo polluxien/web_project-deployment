@@ -33,6 +33,12 @@ jobs:
         run: |
           docker-compose -f docker-compose.yml build
 
+      # Test Frontend und Backend connection
+      - name: Test Frontend Connectivity
+        run: curl -I http://frontend:3000
+      - name: Test Backend Connectivity
+        run: curl -I http://backend:3001
+
       # Run Backend tests
       - name: Run Backend Tests
         run: |
@@ -45,6 +51,11 @@ jobs:
           docker-compose -f docker-compose.yml run frontend npm ci
           docker-compose -f docker-compose.yml run frontend npx playwright install
           docker-compose -f docker-compose.yml run frontend npm test
+
+    env:
+      FRONTEND_URL: "http://frontend:3000"
+      BACKEND_URL: "http://backend:3001"
+      DB_HOST: "mongodb"
 
   deploy:
     name: Deploy to Production
