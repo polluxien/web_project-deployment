@@ -1,25 +1,25 @@
 # Phase 1: Build-Phase mit Node.js
-FROM node:20 AS build
+FROM node:16
 
-# Arbeitsverzeichnis setzen
-WORKDIR /usr/src/app
+# Installiere systemweite Abhängigkeiten für Playwright
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libx11-xcb1 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Abhängigkeiten kopieren und installieren
+# Arbeitsverzeichnis einrichten
+WORKDIR /app
+
+# Abhängigkeiten installieren
 COPY package*.json ./
 RUN npm install
 
-# Quellcode kopieren und Anwendung bauen
+# Anwendungscode kopieren
 COPY . .
-RUN npm run build
 
-# Phase 2: Bereitstellungsphase mit Nginx
-FROM nginx:alpine
+# Playwright-Browser installieren
+RUN npx playwright install
 
-# Kopiere den Build aus der Node.js-Phase
-COPY --from=build /usr/src/app/build /usr/share/nginx/html
-
-# Exponieren des Ports
-EXPOSE 80
-
-# Standard-Nginx-Startbefehl
-CMD ["nginx", "-g", "daemon off;"]
+# Startbefehl für Tests
+CMD ["npm", "test"]
