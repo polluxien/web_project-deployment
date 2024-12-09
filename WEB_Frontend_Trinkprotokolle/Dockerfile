@@ -1,5 +1,5 @@
-# Node.js-Image verwenden
-FROM node:20
+# Phase 1: Build-Phase mit Node.js
+FROM node:20 AS build
 
 # Arbeitsverzeichnis setzen
 WORKDIR /usr/src/app
@@ -8,19 +8,18 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
-# Anwendung bauen
-RUN npm install
+# Quellcode kopieren und Anwendung bauen
 COPY . .
 RUN npm run build
 
-# Nginx-Image für den fertigen Build verwenden
+# Phase 2: Bereitstellungsphase mit Nginx
 FROM nginx:alpine
 
-# Build in den Nginx-Webserver kopieren
-COPY --from=0 /usr/src/app/build /usr/share/nginx/html
+# Kopiere den Build aus der Node.js-Phase
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
 # Exponieren des Ports
-EXPOSE 3000
+EXPOSE 80
 
-# Start des Nginx-Servers
-CMD ["npm", "start"]
+# Standard-Nginx-Startbefehl
+CMD ["nginx", "-g", "daemon off;"]
