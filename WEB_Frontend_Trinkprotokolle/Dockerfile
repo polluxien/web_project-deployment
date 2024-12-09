@@ -9,6 +9,7 @@ COPY package*.json ./
 RUN npm install
 
 # Anwendung bauen
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -19,7 +20,7 @@ FROM nginx:alpine
 COPY --from=0 /usr/src/app/build /usr/share/nginx/html
 
 # Exponieren des Ports
-EXPOSE 80
+EXPOSE 3000
 
 # Start des Nginx-Servers
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "start"]
