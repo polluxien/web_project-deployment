@@ -9,7 +9,7 @@ import { getAlleProtokolle, getLogin } from "../backend/api";
 import { useEffect, useState } from "react";
 import { ProtokollResource } from "../Resources";
 import { useLoginContext } from "../backend/LoginInfo";
-import { stringToDate } from "../helper/DateHelper"
+import { stringToDate } from "../Helper/DateHelper"
 
 export default function PageIndex() {
   const [protokolle, setProtokolle] = useState<ProtokollResource[]>([]);

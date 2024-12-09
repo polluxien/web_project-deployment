@@ -10,7 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { PflegerResource } from "../Resources";
 import { useLoginContext } from "../backend/LoginInfo";
 import { getAllePfleger, updatePfleger } from "../backend/api";
-import { dateToString, stringToDate } from "../helper/DateHelper";
+import { dateToString, stringToDate } from "../Helper/DateHelper";
 import { DeleteDialog } from "./DeleteDialog";
 
 enum Gender {
