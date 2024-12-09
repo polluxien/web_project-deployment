@@ -1,5 +1,5 @@
 # Phase 1: Build-Phase mit Node.js
-FROM node:16
+FROM node:20
 
 # Installiere systemweite Abhängigkeiten für Playwright
 RUN apt-get update && apt-get install -y \
