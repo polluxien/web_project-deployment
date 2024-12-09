@@ -24,10 +24,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: List project files
+        run: |
+          ls -R
+
       # Build Docker images
       - name: Build Docker images
         run: |
           docker-compose -f docker-compose.yml build
+
+      # Run Backend tests
+      - name: Run Backend Tests
+        run: |
+          docker-compose -f docker-compose.yml run backend npm ci
+          docker-compose -f docker-compose.yml run backend npm test
 
       # Run Frontend tests
       - name: Run Frontend Tests
@@ -35,12 +45,6 @@ jobs:
           docker-compose -f docker-compose.yml run frontend npm ci
           docker-compose -f docker-compose.yml run frontend npx playwright install
           docker-compose -f docker-compose.yml run frontend npm test
-
-      # Run Backend tests
-      - name: Run Backend Tests
-        run: |
-          docker-compose -f docker-compose.yml run backend npm ci
-          docker-compose -f docker-compose.yml run backend npm test
 
   deploy:
     name: Deploy to Production
