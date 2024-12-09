@@ -22,9 +22,6 @@ COPY . .
 RUN npx playwright install
 RUN npx playwright install-deps
 
-# Anwendung starten
-RUN npm start
-
 EXPOSE 3000
 
 # Startbefehl für Tests
