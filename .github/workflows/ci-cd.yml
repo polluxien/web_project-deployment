@@ -10,7 +10,7 @@ on:
 jobs:
   build-and-test:
     name: Build & Test
-    timeout-minutes: 60
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:
@@ -34,10 +34,11 @@ jobs:
           docker-compose -f docker-compose.yml build
 
       # Test Frontend und Backend connection
-      - name: Test Frontend Connectivity
-        run: curl -I http://frontend:3000
-      - name: Test Backend Connectivity
-        run: curl -I http://backend:3001
+      - name: Test Frontend and Backend Connectivity
+        run: |
+          sleep 10
+          curl -I http://frontend:3000
+          curl -I http://backend:3001
 
       # Run Backend tests
       - name: Run Backend Tests
