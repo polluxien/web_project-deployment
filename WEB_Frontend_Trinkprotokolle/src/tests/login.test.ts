@@ -43,7 +43,7 @@ async function logout(page: Page) {
 // EIGENTLICHE TESTING
 test.describe("login", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(process.env.FRONTEND_URL || "http://localhost:3000");
+    await page.goto(process.env.FRONTEND_URL || "http://frontend:3000");
   });
 
   test("login erfolgreich", async ({ page }) => {
