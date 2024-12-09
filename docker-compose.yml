@@ -23,7 +23,7 @@ services:
       - backend
 
   mongodb:
-    image: mongo:9
+    image: mongo
     container_name: mongodb
     ports:
       - "27017:27017"
