@@ -19,6 +19,7 @@ RUN npm install
 COPY . .
 
 # Playwright-Browser installieren
+RUN npx playwright install
 RUN npx playwright install-deps
 
 # Startbefehl für Tests
