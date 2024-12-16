@@ -1,0 +1,75 @@
+version: "3.8"
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: backend-server
+    container_name: backend
+    stdin_open: true
+    volumes:
+      - ./backend/:/usr/src/app
+      - /usr/src/app/node_modules
+      - ./backend/cert:/path/to
+    ports:
+      - "80:80"
+    depends_on:
+      - mongodb
+    env_file:
+      - ./backend/.env
+    environment:
+      - HOST=backend
+      - IS_DOCKER=true
+      - DB_PREFILL=true
+      - NODE_ENV=development
+      - CORS_ORIGIN=http://frontend:3000
+      - MONGODB_URL=mongodb://mongodb:27017/myMongo
+    networks:
+      - mern-app
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: frontend-client
+    container_name: frontend
+    stdin_open: true
+    volumes:
+      - ./frontend/:/usr/app
+      - /usr/app/node_modules
+      - ./frontend/cert:/path/to
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env
+    environment:
+      - HTTPS=false
+      - CHOKIDAR_USEPOLLING=true
+      - WDS_SOCKET_PORT=0
+      - REACT_APP_REAL_FETCH=true
+      - REACT_APP_API_SERVER_URL=http://localhost
+      - REACT_APP_FRONTEND_SERVER_URL=http://frontend:3000
+    networks:
+      - mern-app
+    restart: on-failure
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    volumes:
+      - mongodb-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - mern-app
+    environment:
+      - MONGO_INITDB_DATABASE=myMongo
+    restart: always
+
+networks:
+  mern-app:
+
+volumes:
+  mongodb-data:
+    driver: local
