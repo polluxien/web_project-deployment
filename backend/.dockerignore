@@ -1,0 +1,57 @@
+node_modules# Dependency directories
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Git and version control
+.git
+.gitignore
+
+# IDE and editor folders
+.vscode
+.idea
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+
+# Build output
+dist
+build
+out
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+
+# Development specific
+.eslintrc
+.prettierrc
+README.md
+CHANGELOG.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Backup files
+*.backup
+*~
+
+# Misc
+.tmp
+.cache
