@@ -6,7 +6,7 @@ export class AdminPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.baseURL = "https://localhost:3000";
+    this.baseURL = "https://localhost:3000/";
   }
 
   // Navigation
@@ -21,7 +21,7 @@ export class AdminPage {
   // Login related actions
   async login(username: string, password: string) {
     await this.page.getByTestId("login-button").click();
-    await this.page.getByTestId("login-username").fill(username);
+    await this.page.getByRole("textbox", { name: "name" }).fill(username);
     await this.page.getByTestId("login-password").fill(password);
     await this.page.getByTestId("submit-button").click();
   }
@@ -109,7 +109,7 @@ export class AdminPage {
   }
 
   async getCaregiverDetails(name: string) {
-    await this.page.getByRole("button", { name }).click();
+    await this.page.getByRole("button", { name: `${name} Admin` }).click();
     return {
       gender: await this.page.getByText("Geschlecht:").isVisible(),
       birthDate: await this.page.getByText("Geburtsdatum:").isVisible(),

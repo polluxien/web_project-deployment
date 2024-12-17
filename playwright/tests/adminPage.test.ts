@@ -1,31 +1,30 @@
 import { test, expect } from "@playwright/test";
-import { AdminPage } from "./AdminPage";
+import { AdminPage } from "./pom/adminPage";
+
+const myTester1 = { name: "Tobi", password: "123_abc_ABC" };
+const myTester2 = { name: "Berguan", password: "123_abc_ABC" };
+const myTester3 = { name: "Redina", password: "123_abc_ABC" };
+
+let adminPage: AdminPage;
 
 test.describe("Admin Page Visibility", () => {
-  let adminPage: AdminPage;
-
   test.beforeEach(async ({ page }) => {
     adminPage = new AdminPage(page);
     await adminPage.goto();
   });
 
   test("admin area visible and accessible for admin users", async () => {
-    await adminPage.login(
-      process.env.PFLEGER_ADMIN_NAME_1!,
-      process.env.PFLEGER_PASSWORD!
-    );
-    await adminPage.navigateToAdmin();
+    await adminPage.login(myTester1.name, myTester1.name);
+    expect(await adminPage.isAdminLinkVisible()).toBeTruthy();
 
+    await adminPage.navigateToAdmin();
     expect(await adminPage.getCurrentUrl()).toBe(
-      "https://localhost:3000/admin"
+      "https://localhost:3000/admin" // <-hier anpassen
     );
   });
 
   test("admin area not visible for non-admin users", async () => {
-    await adminPage.login(
-      process.env.PFLEGER_NAME_3!,
-      process.env.PFLEGER_PASSWORD!
-    );
+    await adminPage.login(myTester2.name, myTester2.password);
 
     expect(await adminPage.isAdminLinkVisible()).toBeFalsy();
   });
@@ -37,16 +36,13 @@ test.describe("User Management", () => {
   test.beforeEach(async ({ page }) => {
     adminPage = new AdminPage(page);
     await adminPage.goto();
-    await adminPage.login(
-      process.env.PFLEGER_ADMIN_NAME_1!,
-      process.env.PFLEGER_PASSWORD!
-    );
+    await adminPage.login(myTester1.name, myTester2.password);
     await adminPage.navigateToAdmin();
   });
 
   test("logged in user visible with all attributes", async () => {
     const details = await adminPage.getCaregiverDetails(
-      process.env.PFLEGER_ADMIN_NAME_1! + " Admin"
+      myTester1.name
     );
 
     expect(details.gender).toBeTruthy();
@@ -74,7 +70,7 @@ test.describe("User Management", () => {
       birthDate: "2024-10-05",
       address: "Kantstraße 6, Berlin 14059",
       position: "Aushilfe",
-      password: process.env.PFLEGER_PASSWORD!,
+      password: "123_abc_ABC",
     };
 
     await adminPage.createNewCaregiver(newCaregiver);
@@ -130,22 +126,14 @@ test.describe("Delete Logged In User", () => {
   test("delete currently logged in user", async ({ page }) => {
     adminPage = new AdminPage(page);
     await adminPage.goto();
-    await adminPage.login(
-      process.env.PFLEGER_ADMIN_NAME_2!,
-      process.env.PFLEGER_PASSWORD!
-    );
+    await adminPage.login(myTester3.name, myTester3.password);
     await adminPage.navigateToAdmin();
 
-    await adminPage.deleteCaregiver(
-      process.env.PFLEGER_ADMIN_NAME_2! + " Admin"
-    );
+    await adminPage.deleteCaregiver(myTester3.name + " Admin");
 
     expect(await adminPage.getCurrentUrl()).toBe("https://localhost:3000/");
 
-    await adminPage.login(
-      process.env.PFLEGER_ADMIN_NAME_2!,
-      process.env.PFLEGER_PASSWORD!
-    );
+    await adminPage.login(myTester3.name, myTester3.password!);
     expect(await adminPage.isLoginErrorVisible()).toBeTruthy();
   });
 });
