@@ -14,9 +14,12 @@ import { prefillDB } from "./prefill";
 async function setup() {
   let mongodURI = process.env.DB_CONNECTION_STRING || process.env.MONGODB_URL;
   const isDocker = process.env.IS_DOCKER === "true"; // Überprüfen, ob Docker läuft
+  /*
+  Ich lass jetzt einfach beide Ports offen
   const useSSL = process.env.USE_SSL === "true";
+  */
   const httpsPort = parseInt(process.env.HTTPS_PORT!);
-  const host = process.env.HOST || "0.0.0.0";
+  const host = process.env.HOST || "localhost";
 
   // Wenn Docker läuft, setze den MongoDB URI aus der Umgebungsvariable
   if (isDocker) {

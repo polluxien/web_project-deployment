@@ -20,7 +20,7 @@ services:
     environment:
       - HOST=backend
       - IS_DOCKER=true
-      - DB_PREFILL=true
+      - DB_PREFILL=false
       - NODE_ENV=development
       - CORS_ORIGIN=http://frontend:3000
       - MONGODB_URL=mongodb://mongodb:27017/myMongo

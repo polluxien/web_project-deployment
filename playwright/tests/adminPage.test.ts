@@ -1,260 +1,151 @@
-import { test, expect, Page } from "@playwright/test";
-import dotenv from "dotenv";
+import { test, expect } from "@playwright/test";
+import { AdminPage } from "./AdminPage";
 
-// .env-Datei laden
-dotenv.config();
+test.describe("Admin Page Visibility", () => {
+  let adminPage: AdminPage;
 
-// Funktion zur Überprüfung des Login-Status
-async function isLoginSuccessful(page: Page) {
-  const logoutButton = await page.locator('[data-testid="logout-button"]');
-  return await logoutButton.isVisible();
-}
-
-test.describe("admin Page Sichtbarkeit", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("https://localhost:3000");
-  });
-  test("als Admin, Admin bereich Sichtbar und betretbar", async ({ page }) => {
-    await page.getByTestId("login-button").click();
-    await page
-      .getByTestId("login-username")
-      .fill(process.env.PFLEGER_ADMIN_NAME_1!);
-    await page
-      .getByTestId("login-password")
-      .fill(process.env.PFLEGER_PASSWORD!);
-    await page.getByTestId("submit-button").click();
-    await page.getByRole("link", { name: "Admin" }).click();
-
-    //prüfen ob man sich auf der Admin-seite befindet
-    const currentUrl = page.url();
-    expect(currentUrl).toBe("https://localhost:3000/admin");
+    adminPage = new AdminPage(page);
+    await adminPage.goto();
   });
 
-  test("als NICHT Admin, Admin bereich nicht Sichtbar und betretbar", async ({
-    page,
-  }) => {
-    await page.getByTestId("login-button").click();
-    await page.getByTestId("login-username").fill(process.env.PFLEGER_NAME_3!);
-    await page
-      .getByTestId("login-password")
-      .fill(process.env.PFLEGER_PASSWORD!);
-    await page.getByTestId("submit-button").click();
+  test("admin area visible and accessible for admin users", async () => {
+    await adminPage.login(
+      process.env.PFLEGER_ADMIN_NAME_1!,
+      process.env.PFLEGER_PASSWORD!
+    );
+    await adminPage.navigateToAdmin();
 
-    //prüfen ob Admin Page sichtbar als nicht Admin
-    const visability = await page
-      .getByRole("link", { name: "Admin" })
-      .isVisible();
-    expect(visability).toBeFalsy();
+    expect(await adminPage.getCurrentUrl()).toBe(
+      "https://localhost:3000/admin"
+    );
+  });
+
+  test("admin area not visible for non-admin users", async () => {
+    await adminPage.login(
+      process.env.PFLEGER_NAME_3!,
+      process.env.PFLEGER_PASSWORD!
+    );
+
+    expect(await adminPage.isAdminLinkVisible()).toBeFalsy();
   });
 });
 
-test.describe("Usermangement verwaltung", () => {
+test.describe("User Management", () => {
+  let adminPage: AdminPage;
+
   test.beforeEach(async ({ page }) => {
-    //einlog Prozess mit Admin User
-    await page.goto("https://localhost:3000");
-    await page.getByTestId("login-button").click();
-    await page
-      .getByTestId("login-username")
-      .fill(process.env.PFLEGER_ADMIN_NAME_1!);
-    await page
-      .getByTestId("login-password")
-      .fill(process.env.PFLEGER_PASSWORD!);
-    await page.getByTestId("submit-button").click();
-    await page.getByRole("link", { name: "Admin" }).click();
+    adminPage = new AdminPage(page);
+    await adminPage.goto();
+    await adminPage.login(
+      process.env.PFLEGER_ADMIN_NAME_1!,
+      process.env.PFLEGER_PASSWORD!
+    );
+    await adminPage.navigateToAdmin();
   });
 
-  test("eingellogter User im Usermangment sichtbar mit allen Attributen", async ({
-    page,
-  }) => {
-    await page
-      .getByRole("button", {
-        name: process.env.PFLEGER_ADMIN_NAME_1! + " Admin",
-      })
-      .click();
+  test("logged in user visible with all attributes", async () => {
+    const details = await adminPage.getCaregiverDetails(
+      process.env.PFLEGER_ADMIN_NAME_1! + " Admin"
+    );
 
-    //Sichtbarkeit der einzelenen Attribute vom Testuser
-    expect(page.getByText("Geschlecht: Männlich").isVisible()).toBeTruthy();
-    expect(
-      await page.getByText("Geburtsdatum: 10.04.1975").isVisible()
-    ).toBeTruthy();
-    expect(
-      await page.getByText("Adresse: Behrensenstraße 14,").isVisible()
-    ).toBeTruthy();
-    expect(
-      await page.getByText("Position: Abteilungsleiter").isVisible()
-    ).toBeTruthy();
+    expect(details.gender).toBeTruthy();
+    expect(details.birthDate).toBeTruthy();
+    expect(details.address).toBeTruthy();
+    expect(details.position).toBeTruthy();
   });
 
-  test("Anlegen von neuen Pfleger ohne Passwort", async ({ page }) => {
-    await page.getByRole("button", { name: "Neuen Pfleger" }).click();
-    await page.getByPlaceholder("Max Mustermann").click();
-    await page.getByPlaceholder("Max Mustermann").fill("Lisabeth");
-    await page.getByLabel("Geschlecht").selectOption("Männlich");
-    await page.getByLabel("Geburtsdatum").fill("2024-10-05");
-    await page.getByLabel("Adresse").click();
-    await page.getByLabel("Adresse").fill("Kantstraße 6, Berlin 14059");
-    await page.getByLabel("Position").click();
-    await page.getByLabel("Position").fill("Aushilfe");
-    await page.getByLabel("Position").press("Tab");
-    await page.getByRole("button", { name: "Speichern" }).click();
-
-    //Fehlercode wird angezeigt
-    let visable = await page
-      .getByText("Bitte geben Sie ein gültiges Passwort ein (3-100 Zeichen)")
-      .isVisible();
-    expect(visable).toBeTruthy();
-  });
-
-  test("Erstellter Pfleger kann sich einloggen", async ({ page }) => {
-    //Verstehe nicht wieso der Test nicht funktioniert wobei genau unter den Attributen, ein neuer Pfler erstellt und sichtbar ist
-    await page.getByRole("button", { name: "Neuen Pfleger" }).click();
-    await page.getByPlaceholder("Max Mustermann").click();
-    await page.getByPlaceholder("Max Mustermann").fill("Lisabeth");
-    await page.getByLabel("Geschlecht").selectOption("Männlich");
-    await page.getByLabel("Geburtsdatum").fill("2024-10-05");
-    await page.getByLabel("Adresse").click();
-    await page.getByLabel("Adresse").fill("Kantstraße 6, Berlin 14059");
-    await page.getByLabel("Position").click();
-    await page.getByLabel("Position").fill("Aushilfe");
-    await page.getByLabel("Position").press("Tab");
-    await page.getByLabel("Passwort").fill(process.env.PFLEGER_PASSWORD!);
-    await page.getByRole("button", { name: "Speichern" }).click();
-
-
-    //ausloggen
-    await page.getByTestId("logout-button").click();
-    //einloggen
-    await page.getByTestId("login-button").click();
-    await page
-      .getByTestId("login-username")
-      .fill("Lisabeth");
-    await page
-      .getByTestId("login-password")
-      .fill(process.env.PFLEGER_PASSWORD!);
-    await page.getByTestId("submit-button").click();
-
-    await page.screenshot({
-      path: "testsScreenshots/admin/anlegenNeuerPfleger.png",
-      fullPage: true,
+  test("creating new caregiver without password shows error", async () => {
+    await adminPage.createNewCaregiver({
+      name: "Lisabeth",
+      gender: "Männlich",
+      birthDate: "2024-10-05",
+      address: "Kantstraße 6, Berlin 14059",
+      position: "Aushilfe",
     });
 
-    //logout ist sichtbar
-    const log = await page.getByTestId("logout-button").isVisible();
-    expect(log).toBeTruthy()
-
+    expect(await adminPage.isPasswordErrorVisible()).toBeTruthy();
   });
 
-  test("Anlegen von neuen Pfleger abbrechen", async ({ page }) => {
-    await page.getByRole("button", { name: "Neuen Pfleger" }).click();
-    await page.getByPlaceholder("Max Mustermann").fill("Alina");
+  test("created caregiver can login", async () => {
+    const newCaregiver = {
+      name: "Lisabeth",
+      gender: "Männlich",
+      birthDate: "2024-10-05",
+      address: "Kantstraße 6, Berlin 14059",
+      position: "Aushilfe",
+      password: process.env.PFLEGER_PASSWORD!,
+    };
 
-    //abbrechen
-    await page.getByRole("button", { name: "Abbrechen" }).click();
-    const visability = await page
-      .getByRole("button", { name: "Alina" })
-      .isVisible();
-    expect(visability).toBeFalsy();
+    await adminPage.createNewCaregiver(newCaregiver);
+    await adminPage.logout();
+    await adminPage.login(newCaregiver.name, newCaregiver.password);
+
+    expect(await adminPage.isLogoutButtonVisible()).toBeTruthy();
   });
 
-  test("Löschen von anderen Pflegern", async ({ page }) => {
-    await page.getByRole("button", { name: "Lisa Admin" }).click();
-    await page.getByRole("button", { name: "Löschen" }).click();
-    await page.getByRole("button", { name: "OK" }).click();
+  test("cancel creating new caregiver", async () => {
+    await adminPage.createNewCaregiver({
+      name: "Alina",
+      gender: "Männlich",
+      birthDate: "2024-10-05",
+      address: "Test Address",
+      position: "Test Position",
+    });
 
-    //
-    const visability = await page
-      .getByRole("button", { name: "Lisa Admin" })
-      .isVisible();
-    expect(visability).toBeFalsy();
+    expect(await adminPage.isCaregiverVisible("Alina")).toBeFalsy();
   });
 
-  test("Löschen abbrechen immer noch da", async ({ page }) => {
-    await page.getByRole("button", { name: "Micha Admin" }).click(); //
-    await page.getByRole("button", { name: "Löschen" }).click();
-    await page.getByRole("button", { name: "Abbrechen" }).click();
+  test("delete other caregivers", async () => {
+    await adminPage.deleteCaregiver("Lisa Admin");
 
-    //ist immer noch da
-    const visability = await page
-      .getByRole("button", { name: "Micha Admin" }) //
-      .isVisible();
-    expect(visability).toBeTruthy();
+    expect(await adminPage.isCaregiverVisible("Lisa Admin")).toBeFalsy();
   });
 
-  test("Bearbeiten von Pfleger", async ({ page }) => {
-    await page.getByRole("button", { name: "Micha Admin" }).click();
-    await page.getByRole("button", { name: "Editieren" }).click();
-    await page.getByLabel("Geschlecht").selectOption("Divers");
-    await page.getByLabel("Geburtsdatum").fill("1975-10-05");
-    await page.getByLabel("Adresse").click();
-    await page.getByLabel("Adresse").fill("Behrensenstraße 14, 14059 Köln");
-    await page.getByLabel("Position").click();
-    await page.getByLabel("Position").fill("Abteilungsleiter*in");
-    await page.getByRole("button", { name: "Speichern" }).click();
+  test("cancel caregiver deletion", async () => {
+    await adminPage.deleteCaregiver("Micha Admin", false);
 
-    //Attribute überprüfen
-    await page.getByRole("button", { name: "Micha Admin" }).click();
+    expect(await adminPage.isCaregiverVisible("Micha Admin")).toBeTruthy();
+  });
 
-    const positionVisible = await page
-      .getByText("Position: Abteilungsleiter*in")
-      .isVisible();
-    const geschlechtVisible = await page
-      .getByText("Geschlecht: Divers")
-      .isVisible();
-    const geburtsdatumVisible = await page
-      .getByText("Geburtsdatum: 05.10.1975")
-      .isVisible();
-    const adresseVisible = await page
-      .getByText("Adresse: Behrensenstraße 14, 14059 Köln")
-      .isVisible();
+  test("edit caregiver details", async () => {
+    await adminPage.editCaregiver("Micha Admin", {
+      gender: "Divers",
+      birthDate: "1975-10-05",
+      address: "Behrensenstraße 14, 14059 Köln",
+      position: "Abteilungsleiter*in",
+    });
 
-    expect(positionVisible).toBeTruthy();
-    expect(geschlechtVisible).toBeTruthy();
-    expect(geburtsdatumVisible).toBeTruthy();
-    expect(adresseVisible).toBeTruthy();
+    const details = await adminPage.getCaregiverDetails("Micha Admin");
+    expect(details.gender).toBeTruthy();
+    expect(details.birthDate).toBeTruthy();
+    expect(details.address).toBeTruthy();
+    expect(details.position).toBeTruthy();
   });
 });
 
-test.describe("eingeloggten Pfleger löschen", async () => {
-  test("eingeloggten Pfleger löschen", async ({ page }) => {
-    //einlog Prozess mit Admin User Lisa
-    await page.goto("https://localhost:3000");
-    await page.getByTestId("login-button").click();
-    await page
-      .getByTestId("login-username")
-      .fill(process.env.PFLEGER_ADMIN_NAME_2!);
-    await page
-      .getByTestId("login-password")
-      .fill(process.env.PFLEGER_PASSWORD!);
-    await page.getByTestId("submit-button").click();
-    await page.getByRole("link", { name: "Admin" }).click();
+test.describe("Delete Logged In User", () => {
+  let adminPage: AdminPage;
 
-    //Hier vlt nicht den Pfleger nehmen den ich für alle Tests benutzte lol
-    await page
-      .getByRole("button", {
-        name: process.env.PFLEGER_ADMIN_NAME_2! + " Admin",
-      })
-      .click();
-    await page.getByRole("button", { name: "Löschen" }).click();
-    await page.getByRole("button", { name: "OK" }).click();
+  test("delete currently logged in user", async ({ page }) => {
+    adminPage = new AdminPage(page);
+    await adminPage.goto();
+    await adminPage.login(
+      process.env.PFLEGER_ADMIN_NAME_2!,
+      process.env.PFLEGER_PASSWORD!
+    );
+    await adminPage.navigateToAdmin();
 
-    //prüfen ob auf Startseite und nicht mehr im Admin bereich
-    await page.waitForNavigation({
-      timeout: 30000,
-      url: "https://localhost:3000/",
-    });
-    const currentUrl = page.url();
-    expect(currentUrl).toBe("https://localhost:3000/");
+    await adminPage.deleteCaregiver(
+      process.env.PFLEGER_ADMIN_NAME_2! + " Admin"
+    );
 
-    //prüfen ob login möglich
-    await page.getByTestId("login-button").click();
-    await page
-      .getByTestId("login-username")
-      .fill(process.env.PFLEGER_ADMIN_NAME_2!);
-    await page
-      .getByTestId("login-password")
-      .fill(process.env.PFLEGER_PASSWORD!);
-    await page.getByTestId("submit-button").click();
-    const errorMessage = await page.locator('[data-testid="login-error"]');
-    expect(await errorMessage.isVisible()).toBeTruthy();
+    expect(await adminPage.getCurrentUrl()).toBe("https://localhost:3000/");
+
+    await adminPage.login(
+      process.env.PFLEGER_ADMIN_NAME_2!,
+      process.env.PFLEGER_PASSWORD!
+    );
+    expect(await adminPage.isLoginErrorVisible()).toBeTruthy();
   });
 });

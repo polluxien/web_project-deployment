@@ -13,6 +13,7 @@ export function configureCORS(app: express.Express) {
   const corsOptions: CorsOptions = {
     origin: [
       "http://localhost:3000",
+      "https://localhost:3000",
       "http://frontend:3000",
       process.env.CORS_ORIGIN!,
     ].filter(Boolean), // Entfernt undefined/null Werte
