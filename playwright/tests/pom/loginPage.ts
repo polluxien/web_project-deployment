@@ -3,16 +3,15 @@ import { Page } from "@playwright/test";
 
 export class LoginPage {
   private page: Page;
-  private baseURL: string;
 
   constructor(page: Page) {
     this.page = page;
-    this.baseURL = "https://localhost:3000/";
   }
 
   // Navigation
   async goto() {
-    await this.page.goto(this.baseURL);
+    //Startseite mit baseURL
+    await this.page.goto("/"); 
   }
 
   async enterCredentials(page: Page, name: string, password: string) {

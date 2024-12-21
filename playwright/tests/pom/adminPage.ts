@@ -2,16 +2,14 @@ import { Page } from "@playwright/test";
 
 export class AdminPage {
   private page: Page;
-  private baseURL: string;
 
   constructor(page: Page) {
     this.page = page;
-    this.baseURL = "https://localhost:3000/";
   }
 
   // Navigation
   async goto() {
-    await this.page.goto(this.baseURL);
+    await this.page.goto("/");
   }
 
   async navigateToAdmin() {
@@ -24,6 +22,12 @@ export class AdminPage {
     await this.page.getByRole("textbox", { name: "name" }).fill(username);
     await this.page.getByTestId("login-password").fill(password);
     await this.page.getByTestId("submit-button").click();
+
+    await this.page.waitForLoadState("networkidle");
+    await this.page.waitForSelector('[data-testid="logout-button"]', {
+      state: "visible",
+      timeout: 5000,
+    });
   }
 
   async logout() {
@@ -61,13 +65,14 @@ export class AdminPage {
   }
 
   async editCaregiver(
-    name: string,
     {
+      name,
       gender,
       birthDate,
       address,
       position,
     }: {
+      name: string,
       gender: string;
       birthDate: string;
       address: string;
@@ -76,7 +81,7 @@ export class AdminPage {
   ) {
     await this.page.getByRole("button", { name }).click();
     await this.page.getByRole("button", { name: "Editieren" }).click();
-    await this.page.getByLabel("Geschlecht").selectOption(gender);
+    await this.page.locator('#gender').first().selectOption(gender);
     await this.page.getByLabel("Geburtsdatum").fill(birthDate);
     await this.page.getByLabel("Adresse").fill(address);
     await this.page.getByLabel("Position").fill(position);
@@ -108,13 +113,39 @@ export class AdminPage {
     return this.page.url();
   }
 
-  async getCaregiverDetails(name: string) {
+  async getCaregiverDetails({
+    name,
+    gender,
+    birthDate,
+    address,
+    position,
+    password,
+  }: {
+    name: string;
+    gender: string;
+    birthDate: string;
+    address: string;
+    position: string;
+    password?: string;
+  }) {
     await this.page.getByRole("button", { name: `${name} Admin` }).click();
     return {
-      gender: await this.page.getByText("Geschlecht:").isVisible(),
-      birthDate: await this.page.getByText("Geburtsdatum:").isVisible(),
-      address: await this.page.getByText("Adresse:").isVisible(),
-      position: await this.page.getByText("Position:").isVisible(),
+      gender: await this.page
+        .getByText("Geschlecht: " + gender)
+        .first()
+        .isVisible(),
+      birthDate: await this.page
+        .getByText("Geburtsdatum: " + birthDate)
+        .first()
+        .isVisible(),
+      address: await this.page
+        .getByText("Adresse: " + address)
+        .first()
+        .isVisible(),
+      position: await this.page
+        .getByText("Position: " + position)
+        .first()
+        .isVisible(),
     };
   }
 

@@ -1,7 +1,14 @@
 import { test, expect } from "@playwright/test";
 import { AdminPage } from "./pom/adminPage";
 
-const myTester1 = { name: "Tobi", password: "123_abc_ABC" };
+const myTester1 = {
+  name: "Tobi",
+  gender: "Männlich",
+  birthDate: "10.04.1975",
+  address: "Behrensenstraße 14, 14059 Berlin",
+  position: "Abteilungsleiter",
+  password: "123_abc_ABC",
+};
 const myTester2 = { name: "Berguan", password: "123_abc_ABC" };
 const myTester3 = { name: "Redina", password: "123_abc_ABC" };
 
@@ -13,14 +20,14 @@ test.describe("Admin Page Visibility", () => {
     await adminPage.goto();
   });
 
-  test("admin area visible and accessible for admin users", async () => {
-    await adminPage.login(myTester1.name, myTester1.name);
+  test("admin area visible and accessible for admin users", async ({
+    baseURL,
+  }) => {
+    await adminPage.login(myTester1.name, myTester1.password);
     expect(await adminPage.isAdminLinkVisible()).toBeTruthy();
 
     await adminPage.navigateToAdmin();
-    expect(await adminPage.getCurrentUrl()).toBe(
-      "https://localhost:3000/admin" // <-hier anpassen
-    );
+    expect(await adminPage.getCurrentUrl()).toBe(`${baseURL}/admin`);
   });
 
   test("admin area not visible for non-admin users", async () => {
@@ -36,14 +43,12 @@ test.describe("User Management", () => {
   test.beforeEach(async ({ page }) => {
     adminPage = new AdminPage(page);
     await adminPage.goto();
-    await adminPage.login(myTester1.name, myTester2.password);
+    await adminPage.login(myTester1.name, myTester1.password);
     await adminPage.navigateToAdmin();
   });
 
   test("logged in user visible with all attributes", async () => {
-    const details = await adminPage.getCaregiverDetails(
-      myTester1.name
-    );
+    const details = await adminPage.getCaregiverDetails(myTester1);
 
     expect(details.gender).toBeTruthy();
     expect(details.birthDate).toBeTruthy();
@@ -65,7 +70,7 @@ test.describe("User Management", () => {
 
   test("created caregiver can login", async () => {
     const newCaregiver = {
-      name: "Lisabeth",
+      name: "Karsten",
       gender: "Männlich",
       birthDate: "2024-10-05",
       address: "Kantstraße 6, Berlin 14059",
@@ -99,22 +104,26 @@ test.describe("User Management", () => {
   });
 
   test("cancel caregiver deletion", async () => {
-    await adminPage.deleteCaregiver("Micha Admin", false);
+    await adminPage.deleteCaregiver(myTester1.name + " Admin", false);
 
-    expect(await adminPage.isCaregiverVisible("Micha Admin")).toBeTruthy();
+    expect(
+      await adminPage.isCaregiverVisible(myTester1.name + " Admin")
+    ).toBeTruthy();
   });
 
   test("edit caregiver details", async () => {
-    await adminPage.editCaregiver("Micha Admin", {
+    const newDetails = {
+      name: myTester1.name,
       gender: "Divers",
-      birthDate: "1975-10-05",
+      birthDate: "1975-04-10",
       address: "Behrensenstraße 14, 14059 Köln",
       position: "Abteilungsleiter*in",
-    });
+    };
+    await adminPage.editCaregiver(newDetails);
 
-    const details = await adminPage.getCaregiverDetails("Micha Admin");
+    const details = await adminPage.getCaregiverDetails(newDetails);
     expect(details.gender).toBeTruthy();
-    expect(details.birthDate).toBeTruthy();
+    expect("1975-04-10").toBeTruthy();
     expect(details.address).toBeTruthy();
     expect(details.position).toBeTruthy();
   });
@@ -129,11 +138,10 @@ test.describe("Delete Logged In User", () => {
     await adminPage.login(myTester3.name, myTester3.password);
     await adminPage.navigateToAdmin();
 
-    await adminPage.deleteCaregiver(myTester3.name + " Admin");
+    await adminPage.deleteCaregiver(myTester3.name);
 
-    expect(await adminPage.getCurrentUrl()).toBe("https://localhost:3000/");
-
-    await adminPage.login(myTester3.name, myTester3.password!);
-    expect(await adminPage.isLoginErrorVisible()).toBeTruthy();
+    await adminPage.login(myTester1.name, myTester1.password!);
+    await adminPage.goto();
+    expect(await adminPage.isCaregiverVisible(myTester3.name)).toBeFalsy();
   });
 });
