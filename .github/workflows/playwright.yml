@@ -10,8 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
       - name: Start mern_application containers
-        run: docker-compose up -d frontend backend mongodb
+        run: docker compose up -d frontend backend mongodb
 
       - name: Wait for services
         run: |
