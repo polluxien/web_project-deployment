@@ -5,8 +5,8 @@ WORKDIR /tests
 # Package files kopieren
 COPY package.json package-lock.json ./
 
-# Clean install mit explizitem Registry
-RUN npm ci --registry=https://registry.npmjs.org/
+# Installiere Dependencies
+RUN npm install
 
 # Nur Firefox installieren
 RUN npx playwright install firefox
@@ -18,4 +18,4 @@ COPY . .
 RUN npm list
 
 # Test Command
-CMD ["npm", "run", "test"]
+CMD ["npx", "run", "test"]
