@@ -13,13 +13,19 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
-      - name: Start mern_application containers
-        run: docker compose up -d frontend backend mongodb
+      - name: Start frontend
+        run: docker compose up -d frontend 
+
+      - name: Start mongodb
+        run: docker compose up -d mongodb
+
+      - name: Start backend
+        run: docker compose up -d backend 
 
       - name: Wait for services
         run: |
-          docker-compose run --rm e2e-tests npx wait-on http://frontend:3000
-          docker-compose run --rm e2e-tests npx wait-on http://backend:80
+          docker compose run --rm e2e-tests npx wait-on http://frontend:3000
+          docker compose run --rm e2e-tests npx wait-on http://backend:80
 
       - name: Run tests
         run: docker-compose run --rm e2e-tests npx playwright test
