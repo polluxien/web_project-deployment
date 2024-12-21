@@ -6,7 +6,7 @@ WORKDIR /tests
 COPY package.json package-lock.json ./
 
 # Installiere Dependencies
-RUN npm install
+RUN npm ci
 
 # Nur Firefox installieren
 RUN npx playwright install firefox
