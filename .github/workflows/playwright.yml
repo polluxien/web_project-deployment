@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Playwright E2E Tests
 on:
   push:
     branches: [ main, master ]
@@ -6,22 +6,30 @@ on:
     branches: [ main, master ]
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - uses: actions/checkout@v4
+
+      - name: Start mern_application containers
+        run: docker-compose up -d frontend backend mongodb
+
+      - name: Wait for services
+        run: |
+          docker-compose run --rm e2e-tests npx wait-on http://frontend:3000
+          docker-compose run --rm e2e-tests npx wait-on http://backend:80
+
+      - name: Run tests
+        run: docker-compose run --rm e2e-tests npx playwright test
+        env:
+          BASE_URL: http://frontend:3000
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose down

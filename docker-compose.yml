@@ -67,6 +67,21 @@ services:
       - MONGO_INITDB_DATABASE=myMongo
     restart: always
 
+  e2e-tests:
+    build:
+      context: ./playwright
+      dockerfile: Dockerfile.playwright
+    depends_on:
+      - frontend
+      - backend
+    environment:
+      - RUNNING_LOCAL=false
+    networks:
+      - mern-app
+    volumes:
+      - ./playwright:/tests
+      - ./playwright-report:/tests/playwright-report
+
 networks:
   mern-app:
 
