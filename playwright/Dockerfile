@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm ci
 
 # Playwright installieren
-RUN npx playwright install --with-deps
+RUN npx playwright install firefox
 
 # Alles kopieren
 COPY . .
