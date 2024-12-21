@@ -9,7 +9,5 @@ RUN npm ci
 # Playwright installieren
 RUN npx playwright install --with-deps
 
-RUN npm install wait-on
-
 # Alles kopieren
 COPY . .
