@@ -20,7 +20,7 @@ services:
     environment:
       - HOST=backend
       - IS_DOCKER=true
-      - DB_PREFILL=false
+      - DB_PREFILL=true
       - NODE_ENV=development
       - CORS_ORIGIN=http://frontend:3000
       - MONGODB_URL=mongodb://mongodb:27017/myMongo
@@ -70,11 +70,12 @@ services:
   e2e-tests:
     build:
       context: ./playwright
-      dockerfile: Dockerfile.playwright
+      dockerfile: Dockerfile
     depends_on:
       - frontend
       - backend
     environment:
+      - BASE_URL=http://frontend:3000
       - RUNNING_LOCAL=false
     networks:
       - mern-app
