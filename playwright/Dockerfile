@@ -1,4 +1,3 @@
-# Dockerfile.playwright
 FROM mcr.microsoft.com/playwright:v1.41.0-focal
 
 WORKDIR /tests
@@ -10,9 +9,7 @@ RUN npm ci
 # Playwright installieren
 RUN npx playwright install --with-deps
 
-# Test-Files kopieren
-COPY playwright ./playwright
-COPY playwright.config.ts ./
+RUN npm install wait-on
 
-# Tests ausführen
-CMD ["npm", "test"]
+# Alles kopieren
+COPY . .
