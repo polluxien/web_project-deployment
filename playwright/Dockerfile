@@ -3,10 +3,10 @@ FROM mcr.microsoft.com/playwright:v1.41.0-focal
 WORKDIR /tests
 
 # Package files kopieren
-COPY package.json package-lock.json ./
+COPY package-lock.json ./
 
 # Installiere Dependencies
-RUN npm ci
+RUN npm ci --no-audit --no-fund
 
 # Nur Firefox installieren
 RUN npx playwright install firefox
@@ -18,4 +18,4 @@ COPY . .
 RUN npm list
 
 # Test Command
-CMD ["npx", "run", "test"]
+ENTRYPOINT ["npx", "playwright", "test"]
