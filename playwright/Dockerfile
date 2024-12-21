@@ -2,12 +2,16 @@ FROM mcr.microsoft.com/playwright:v1.41.0-focal
 
 WORKDIR /tests
 
-# Dependencies kopieren und installieren
+# Debug: Verzeichnis anzeigen
+RUN pwd && ls -la
+
 COPY package*.json ./
 RUN npm ci
-
-# Playwright installieren
 RUN npx playwright install firefox
 
-# Alles kopieren
+# Debug: Prüfen ob Installation erfolgreich war
+RUN which npx
+RUN ls -la node_modules/.bin/
+RUN npm ls @playwright/test
+
 COPY . .
