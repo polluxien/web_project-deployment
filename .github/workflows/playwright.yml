@@ -22,13 +22,8 @@ jobs:
       - name: Start backend-Container
         run: docker compose up -d backend 
        
-      - name: short waiting of 30 seconds
+      - name: Waiting 15 seconds
         run: sleep 30
-
-      - name: Wait for services
-        run: |
-          docker compose run --rm e2e-tests npx wait-on http://frontend:3000
-          docker compose run --rm e2e-tests npx wait-on http://backend:80
 
       - name: Run tests
         run: docker compose run --rm e2e-tests npx playwright test
