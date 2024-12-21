@@ -21,12 +21,9 @@ jobs:
 
       - name: Start backend-Container
         run: docker compose up -d backend 
-       
-      - name: Waiting 15 seconds
-        run: sleep 30
 
       - name: Run tests
-        run: docker compose run --rm e2e-tests npx playwright test
+        run: docker compose run --rm e2e-tests npm run test
         env:
           BASE_URL: http://frontend:3000
 
