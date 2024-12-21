@@ -1,14 +1,11 @@
-node_modules# Dependency directories
-node_modules
+# Dependency directories
+node_modules/
 npm-debug.log
 yarn-error.log
 
 # Environment files
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 # Git and version control
 .git
@@ -17,44 +14,23 @@ yarn-error.log
 # IDE and editor folders
 .vscode
 .idea
-*.swp
-*.swo
 
 # Logs
 logs
 *.log
 
-# Build output
-dist
-build
-out
-
 # OS generated files
 .DS_Store
 Thumbs.db
 
-# Temporary files
-*.tmp
-*.bak
+# Test outputs
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
 
-# Development specific
-.eslintrc
-.prettierrc
-README.md
-CHANGELOG.md
-
-#test
-__test__
-
-# Docker
-Dockerfile
-docker-compose.yml
-.dockerignore
-
-# Backup files
-*.backup
-*~
-
-# Misc
-.tmp
-.cache
+# WICHTIG: NICHT ignorieren
+# Dockerfile
+# docker-compose.yml
+# package.json
+# package-lock.json
