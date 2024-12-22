@@ -16,5 +16,7 @@ RUN npx playwright install firefox
 # Rest der Files kopieren
 COPY . .
 
+RUN ls -la /playwright/node_modules/.bin/
+
 # Test Command
 CMD ["/playwright/node_modules/.bin/playwright", "test"]
