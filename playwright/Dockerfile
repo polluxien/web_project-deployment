@@ -5,7 +5,7 @@ WORKDIR /playwright
 # Package files kopieren
 COPY package*.json ./
 
-RUN npm install -g @playwright/test@1.41.0
+#RUN npm install -g @playwright/test@1.41.0
 
 # Installiere Dependencies
 RUN npm ci --no-audit --no-fund
@@ -17,4 +17,4 @@ RUN npx playwright install firefox
 COPY . .
 
 # Test Command
-CMD ["npm", "test"]
+CMD ["npx", "playwright", "test"]
