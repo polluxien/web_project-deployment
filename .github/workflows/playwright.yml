@@ -28,16 +28,10 @@ jobs:
       - name: Start backend-Container
         run: docker compose up -d backend
 
-      - name: Build e2e-tests
-        run: docker compose build e2e-tests
-
       - name: Run tests
         run: |
           # Build neu
           docker compose build e2e-tests --no-cache
-          
-          # Verzeichnis prüfen
-          docker compose run --rm e2e-tests ls -la /tests/node_modules
           
           # Tests ausführen
           docker compose run --rm e2e-tests
