@@ -97,7 +97,6 @@ services:
     networks:
       - mern-app
     volumes:
-      - ./playwright:/playwright
       - ./playwright-report:/playwright/playwright-report
 
 networks:
