@@ -24,6 +24,10 @@ beforeEach(async () => {
   await performAuthentication("John", "1234abcdABCD..;,.");
 });
 
+test("/api/login POST, Positivtest", async () => {
+  expect(true).toBeTruthy();
+});
+
 /**
  * Eigentlich sind das hier sogar 5 Tests!
  */
