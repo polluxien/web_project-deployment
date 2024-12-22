@@ -18,4 +18,4 @@ COPY . .
 RUN npm list
 
 # Test Command
-CMD ["npx", "@playwright/test", "test"]
+CMD ["npx", "playwright", "test"]
