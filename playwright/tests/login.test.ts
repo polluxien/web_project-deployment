@@ -6,10 +6,12 @@ const myTester = { name: "Tobi", password: "123_abc_ABC" };
 
 let loginPage: LoginPage;
 
-test.describe("login", () => {
+test.describe.serial("login", () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
-    await loginPage.goto();
+    await loginPage.goto();  console.log('Starting login...');
+    console.log('Current URL:', await page.url());
+
   });
 
   test("login erfolgreich", async ({ page }) => {

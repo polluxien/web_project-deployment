@@ -42,7 +42,8 @@ export default defineConfig({
      baseURL: process.env.RUNNING_LOCAL === "true" 
      ? "https://localhost:3000" 
      : "http://frontend:3000",
-    
+
+     headless: false,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     screenshot: {

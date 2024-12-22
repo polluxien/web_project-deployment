@@ -27,6 +27,10 @@ services:
     networks:
       - mern-app
     restart: on-failure
+    #healthcheck:
+    #  test: ["CMD", "nc", "-z", "localhost", "80"]
+    #  start_period: 1m
+    #  start_interval: 10s
 
   frontend:
     build:
@@ -48,11 +52,20 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - WDS_SOCKET_PORT=0
       - REACT_APP_REAL_FETCH=true
-      - REACT_APP_API_SERVER_URL=http://localhost
+      # bei Localer Webansicht
+      #  - REACT_APP_API_SERVER_URL=http://localhost
+      - REACT_APP_API_SERVER_URL=http://backend:80
       - REACT_APP_FRONTEND_SERVER_URL=http://frontend:3000
+      #Playwright config stuff
+      - DANGEROUSLY_DISABLE_HOST_CHECK=true
+      - WATCHPACK_POLLING=true
     networks:
       - mern-app
     restart: on-failure
+    #healthcheck:
+    #  test: curl --fail http://localhost:3000 || exit 1
+    #  start_period: 1m
+    #  start_interval: 10s
 
   mongodb:
     image: mongo:latest
@@ -71,17 +84,21 @@ services:
     build:
       context: ./playwright
       dockerfile: Dockerfile
+    image: playwright-e2e-tests
+    container_name: e2e-tests
     depends_on:
       - frontend
       - backend
     environment:
       - BASE_URL=http://frontend:3000
       - RUNNING_LOCAL=false
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - mern-app
     volumes:
-      - ./playwright:/tests
-      - ./playwright-report:/tests/playwright-report
+      - ./playwright:/playwright
+      - ./playwright-report:/playwright/playwright-report
 
 networks:
   mern-app:

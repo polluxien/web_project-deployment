@@ -1,7 +1,6 @@
 FROM node:20
 WORKDIR /app
 
-# WICHTIG: Ändern Sie npm ci
 RUN npm install -g npm@latest && \
     npm cache clean --force
 

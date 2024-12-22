@@ -14,7 +14,7 @@ const myTester3 = { name: "Redina", password: "123_abc_ABC" };
 
 let adminPage: AdminPage;
 
-test.describe("Admin Page Visibility", () => {
+test.describe.serial("Admin Page Visibility", () => {
   test.beforeEach(async ({ page }) => {
     adminPage = new AdminPage(page);
     await adminPage.goto();

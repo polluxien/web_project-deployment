@@ -28,6 +28,9 @@ jobs:
       - name: Start backend-Container
         run: docker compose up -d backend
 
+      - name: Wait for 60 seconds
+        run: sleep 60
+
       - name: Run tests
         run: |
           # Build neu
