@@ -18,4 +18,4 @@ COPY . .
 RUN npm list
 
 # Test Command
-ENTRYPOINT ["npx", "playwright", "test"]
+CMD ["npx", "@playwright/test", "test"]
