@@ -17,4 +17,4 @@ RUN npx playwright install firefox
 COPY . .
 
 # Test Command
-CMD ["npx", "playwright", "test", "--headed=false"]
+CMD ["npx", "playwright", "test"]

@@ -43,7 +43,7 @@ export default defineConfig({
      ? "https://localhost:3000" 
      : "http://frontend:3000",
 
-     headless: false,
+     headless: true,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     screenshot: {
