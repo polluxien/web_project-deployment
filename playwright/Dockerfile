@@ -2,23 +2,19 @@ FROM mcr.microsoft.com/playwright:v1.41.0-focal
 
 WORKDIR /playwright
 
-# Erst package.json und package-lock.json kopieren
+# Package files kopieren
 COPY package*.json ./
 
-# Dependencies installieren
-RUN npm install
+#RUN npm install -g @playwright/test@1.41.0
 
-# Dann den Rest der Files kopieren
-COPY . .
+# Installiere Dependencies
+RUN npm ci --no-audit --no-fund
 
-# Browser installieren
+# Nur Firefox installieren
 RUN npx playwright install firefox
 
-# Für Debug-Zwecke: Verzeichnisinhalt anzeigen und Versionen prüfen
-RUN ls -la && \
-    node --version && \
-    npm --version && \
-    npx playwright --version
+# Rest der Files kopieren
+COPY . .
 
-# Test ausführen
-ENTRYPOINT ["npx", "playwright", "test"]
+# Test Command
+CMD ["npx", "playwright", "test", "--headed=false"]
