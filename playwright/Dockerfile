@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/playwright:v1.41.0-focal
 WORKDIR /tests
 
 # Package files kopieren
-COPY package-lock.json ./
+COPY package*.json ./
 
 # Installiere Dependencies
 RUN npm ci --no-audit --no-fund
