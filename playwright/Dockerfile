@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/playwright:v1.41.0-focal
 
-WORKDIR /tests
+WORKDIR /playwright
 
 # Package files kopieren
 COPY package*.json ./
@@ -17,4 +17,4 @@ RUN npx playwright install firefox
 COPY . .
 
 # Test Command
-CMD ["./node_modules/.bin/playwright", "test"]
+CMD ["/playwright/node_modules/.bin/playwright", "test"]
