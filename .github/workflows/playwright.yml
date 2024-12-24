@@ -37,9 +37,7 @@ jobs:
           docker compose build e2e-tests --no-cache
           
           # Tests ausführen
-          docker compose run --rm e2e-tests
-        env:
-          BASE_URL: http://frontend:3000
+          docker compose run -d e2e-tests
 
       - name: Upload test results
         if: always()
